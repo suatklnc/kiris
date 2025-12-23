@@ -3,7 +3,7 @@
 ## Phase 1: Project Skeleton & Core Data Structures
 *Goal: Set up the project structure, dependency management, and define the core classes for Beam and Loads.*
 
-- [~] Task: Initialize Poetry project and install dependencies (numpy, scipy, rich, inquirer, typer, pytest, black, flake8).
+- [x] Task: Initialize Poetry project and install dependencies (numpy, scipy, rich, inquirer, typer, pytest, black, flake8). a50a9ea
 - [ ] Task: Configure project settings (pyproject.toml, pytest.ini, linter configs).
 - [ ] Task: Create `Load` base class and `PointLoad`, `UDL` subclasses (TDD: Write tests first for attributes and validation).
 - [ ] Task: Create `Beam` class with length and support properties (TDD: Write tests first for initialization and validation).
