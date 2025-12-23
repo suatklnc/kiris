@@ -81,3 +81,37 @@ class AnalysisEngine:
                 v += load.magnitude * x
                 
         return v
+
+    def get_bending_moment(self, x: float) -> float:
+        """
+        Calculates the bending moment at position x from the left end of the beam.
+        
+        Args:
+            x (float): Position along the beam (0 to length).
+            
+        Returns:
+            float: Bending moment in kNm.
+        """
+        if x < 0 or x > self.beam.length:
+            raise ValueError(f"Position x={x} is outside the beam limits (0 to {self.beam.length}).")
+
+        reactions = self.calculate_reactions()
+        m = 0.0
+        
+        # Moment from reactions to the left of x
+        for support_loc, force in reactions.items():
+            if support_loc <= x:
+                m += force * (x - support_loc)
+                
+        # Moment from loads to the left of x
+        for load in self.loads:
+            if isinstance(load, PointLoad):
+                if load.location <= x:
+                    m += load.force * (x - load.location)
+            elif isinstance(load, UDL):
+                # Portion of UDL from 0 to x
+                load_portion = load.magnitude * x
+                # Centroid of this portion is at x/2
+                m += load_portion * (x / 2.0)
+                
+        return m

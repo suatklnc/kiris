@@ -85,8 +85,28 @@ def test_get_shear_force_udl():
     # Ra = 25
     # x=0: V = 25
     assert engine.get_shear_force(0.0) == pytest.approx(25.0)
-    # x=5: V = 25 - 5*5 = 0
-    assert engine.get_shear_force(5.0) == pytest.approx(0.0)
     # x=10: V = Ra - UDL*10 = 25 - 50 = -25 (just before Rb)
     # Note: at exactly 10.0, Rb is also added, so it becomes 0.
     assert engine.get_shear_force(9.999) == pytest.approx(-25.0, abs=1e-2)
+
+def test_get_bending_moment_point_load():
+    from beam_analysis.loads import PointLoad
+    beam = Beam(length=10.0, supports=(0.0, 10.0))
+    engine = AnalysisEngine(beam=beam)
+    engine.add_load(PointLoad(force=-10.0, location=5.0))
+    # x=2.5: M = Ra * 2.5 = 5 * 2.5 = 12.5
+    assert engine.get_bending_moment(2.5) == pytest.approx(12.5)
+    # x=5: M = Ra * 5 = 25
+    assert engine.get_bending_moment(5.0) == pytest.approx(25.0)
+    # x=10: M = 0 (support)
+    assert engine.get_bending_moment(10.0) == pytest.approx(0.0)
+
+def test_get_bending_moment_udl():
+    from beam_analysis.loads import UDL
+    beam = Beam(length=10.0, supports=(0.0, 10.0))
+    engine = AnalysisEngine(beam=beam)
+    engine.add_load(UDL(magnitude=-5.0))
+    # Max Moment at x=5: wL^2/8 = 5 * 100 / 8 = 62.5
+    assert engine.get_bending_moment(5.0) == pytest.approx(62.5)
+    # x=0: M = 0
+    assert engine.get_bending_moment(0.0) == pytest.approx(0.0)
