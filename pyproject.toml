@@ -1,0 +1,29 @@
+[project]
+name = "conductortest"
+version = "0.1.0"
+description = ""
+authors = [
+    {name = "suatklnc",email = "suatkilinc0102@gmail.com"}
+]
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "numpy (>=2.4.0,<3.0.0)",
+    "scipy (>=1.16.3,<2.0.0)",
+    "rich (>=14.2.0,<15.0.0)",
+    "inquirer (>=3.4.1,<4.0.0)",
+    "typer (>=0.20.1,<0.21.0)"
+]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[dependency-groups]
+dev = [
+    "pytest (>=9.0.2,<10.0.0)",
+    "pytest-cov (>=7.0.0,<8.0.0)",
+    "black (>=25.12.0,<26.0.0)",
+    "flake8 (>=7.3.0,<8.0.0)"
+]
