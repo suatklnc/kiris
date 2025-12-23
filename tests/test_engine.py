@@ -41,3 +41,15 @@ def test_calculate_reactions_point_load_off_center():
     # Ra (at 0) should be 7.5kN, Rb (at 10) should be 2.5kN
     assert reactions[0.0] == pytest.approx(7.5)
     assert reactions[10.0] == pytest.approx(2.5)
+
+def test_calculate_reactions_udl_full_span():
+    from beam_analysis.loads import UDL
+    beam = Beam(length=10.0, supports=(0.0, 10.0))
+    engine = AnalysisEngine(beam=beam)
+    # 5kN/m downward UDL over 10m
+    load = UDL(magnitude=-5.0)
+    engine.add_load(load)
+    reactions = engine.calculate_reactions()
+    # Total load is 50kN, Ra and Rb should be 25kN each
+    assert reactions[0.0] == pytest.approx(25.0)
+    assert reactions[10.0] == pytest.approx(25.0)

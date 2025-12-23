@@ -1,6 +1,6 @@
 from typing import List, Dict
 from beam_analysis.beam import Beam
-from beam_analysis.loads import Load, PointLoad
+from beam_analysis.loads import Load, PointLoad, UDL
 
 class AnalysisEngine:
     """
@@ -32,18 +32,22 @@ class AnalysisEngine:
         x1, x2 = self.beam.supports
         l_span = x2 - x1
         
-        # Sum of moments about first support (x1) = 0
-        # R2 * (x2 - x1) + Sum(Force * (LoadLocation - x1)) = 0
         total_moment_x1 = 0.0
+        total_vertical_force = 0.0
+
         for load in self.loads:
             if isinstance(load, PointLoad):
                 total_moment_x1 += load.force * (load.location - x1)
+                total_vertical_force += load.force
+            elif isinstance(load, UDL):
+                # UDL is over the entire beam length
+                total_load = load.magnitude * self.beam.length
+                # Centroid of full-span UDL is at length/2
+                centroid = self.beam.length / 2.0
+                total_moment_x1 += total_load * (centroid - x1)
+                total_vertical_force += total_load
         
         r2 = -total_moment_x1 / l_span
-        
-        # Sum of vertical forces = 0
-        # R1 + R2 + Sum(Forces) = 0
-        total_force = sum(load.force for load in self.loads if isinstance(load, PointLoad))
-        r1 = -total_force - r2
+        r1 = -total_vertical_force - r2
         
         return {x1: r1, x2: r2}
