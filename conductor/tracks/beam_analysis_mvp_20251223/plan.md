@@ -1,18 +1,18 @@
 # Track Plan: MVP - Beam Analysis Core & CLI
 
-## Phase 1: Project Skeleton & Core Data Structures
+## Phase 1: Project Skeleton & Core Data Structures [checkpoint: dfbd087]
 *Goal: Set up the project structure, dependency management, and define the core classes for Beam and Loads.*
 
 - [x] Task: Initialize Poetry project and install dependencies (numpy, scipy, rich, inquirer, typer, pytest, black, flake8). a50a9ea
 - [x] Task: Configure project settings (pyproject.toml, pytest.ini, linter configs). 4afb632
 - [x] Task: Create `Load` base class and `PointLoad`, `UDL` subclasses (TDD: Write tests first for attributes and validation). 0317836
 - [x] Task: Create `Beam` class with length and support properties (TDD: Write tests first for initialization and validation). 2fecafe
-- [ ] Task: Conductor - User Manual Verification 'Phase 1: Project Skeleton & Core Data Structures' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 1: Project Skeleton & Core Data Structures' (Protocol in workflow.md)
 
 ## Phase 2: Calculation Engine (Reactions & Internal Forces)
 *Goal: Implement the physics engine to calculate reactions, shear, and moment arrays.*
 
-- [ ] Task: Implement `AnalysisEngine` class structure and dependency injection for Beam.
+- [~] Task: Implement `AnalysisEngine` class structure and dependency injection for Beam.
 - [ ] Task: Implement Reaction Force calculation for Point Loads (TDD: Test simple cases).
 - [ ] Task: Implement Reaction Force calculation for UDL (TDD: Test simple cases).
 - [ ] Task: Implement Reaction Force calculation for combined loads (Superposition principle).
