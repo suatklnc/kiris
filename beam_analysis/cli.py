@@ -28,7 +28,11 @@ def display_input_summary(beam, loads):
                 f"Kuvvet: {load.force} kN, Konum: {load.location} m",
             )
         elif isinstance(load, UDL):
-            table.add_row(f"Yük {i+1} (UDL)", f"Miktar: {load.magnitude} kN/m")
+            end_str = f"{load.end} m" if load.end is not None else "Kiriş Sonu"
+            table.add_row(
+                f"Yük {i+1} (UDL)",
+                f"Miktar: {load.magnitude} kN/m, Aralık: {load.start} - {end_str}",
+            )
         elif isinstance(load, PointMoment):
             table.add_row(
                 f"Yük {i+1} (Moment)",
@@ -136,7 +140,7 @@ def get_loads(beam_length: float):
             )
 
         elif answers["type"] == "udl":
-            q_udl = [
+            q_udl_mag = [
                 inquirer.Text(
                     "magnitude",
                     message="UDL miktarını girin (kN/m, aşağı yönlü için pozitif)",
@@ -145,8 +149,29 @@ def get_loads(beam_length: float):
                     .isdigit(),
                 )
             ]
-            ans_udl = inquirer.prompt(q_udl)
-            loads.append(UDL(magnitude=float(ans_udl["magnitude"])))
+            ans_mag = inquirer.prompt(q_udl_mag)
+            
+            q_udl_loc = [
+                inquirer.Text(
+                    "start",
+                    message=f"Başlangıç konumunu girin (0 - {beam_length} m arası)",
+                    default="0.0",
+                    validate=lambda _, x: 0 <= float(x) < beam_length,
+                ),
+                inquirer.Text(
+                    "end",
+                    message=f"Bitiş konumunu girin (Start - {beam_length} m arası)",
+                    default=str(beam_length),
+                    validate=lambda answers, x: float(answers["start"]) < float(x) <= beam_length,
+                )
+            ]
+            ans_loc = inquirer.prompt(q_udl_loc)
+            
+            loads.append(UDL(
+                magnitude=float(ans_mag["magnitude"]),
+                start=float(ans_loc["start"]),
+                end=float(ans_loc["end"])
+            ))
 
         elif answers["type"] == "moment":
             q_moment = [
