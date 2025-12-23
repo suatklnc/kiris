@@ -18,8 +18,8 @@
 - [x] Task: Implement Reaction Force calculation for combined loads (Superposition principle). 2c84fb8
 - [x] Task: Implement Shear Force calculation logic (arrays/functions) (TDD: Verify V(x) values). d1e2f76
 - [x] Task: Implement Bending Moment calculation logic (arrays/functions) (TDD: Verify M(x) values). 132c1f8
-- [~] Task: Implement `get_max_shear` and `get_max_moment` helper methods.
-- [ ] Task: Conductor - User Manual Verification 'Phase 2: Calculation Engine (Reactions & Internal Forces)' (Protocol in workflow.md)
+- [x] Task: Implement `get_max_shear` and `get_max_moment` helper methods. 3defc48
+- [~] Task: Conductor - User Manual Verification 'Phase 2: Calculation Engine (Reactions & Internal Forces)' (Protocol in workflow.md)
 
 ## Phase 3: CLI Wizard & Input Handling
 *Goal: Build the interactive command-line interface for data entry.*
