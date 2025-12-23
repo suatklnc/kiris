@@ -1,9 +1,11 @@
 import typer
 import inquirer
+import numpy as np
 from rich.console import Console
 from rich.table import Table
 from beam_analysis.beam import Beam
 from beam_analysis.loads import PointLoad, UDL
+from beam_analysis.plotter import ASCIIPlotter
 
 app = typer.Typer(help="Beam Analysis CLI - Saha Mühendisleri için Pratik Kiriş Analiz Aracı")
 console = Console()
@@ -49,6 +51,16 @@ def display_results(engine):
     m_table.add_row("Maksimum Moment (Mmax)", f"{max_m:.2f} kNm", f"{x_m:.2f}")
     
     console.print(m_table)
+
+    # Diagrams
+    plotter = ASCIIPlotter(width=console.width - 10 if console.width > 20 else 60)
+    x_points = np.linspace(0, engine.beam.length, 200)
+    
+    v_points = np.array([engine.get_shear_force(x) for x in x_points])
+    console.print(plotter.plot(x_points, v_points, title="Kesme Kuvveti Diyagramı (SFD) [kN]"))
+    
+    m_points = np.array([engine.get_bending_moment(x) for x in x_points])
+    console.print(plotter.plot(x_points, m_points, title="Eğilme Momenti Diyagramı (BMD) [kNm]"))
 
 def get_beam_info():
     questions = [
@@ -117,7 +129,8 @@ def main():
     for load in loads:
         engine.add_load(load)
     
-    console.print("\n[bold green]Analiz Hazır![/bold green]")
+    console.print("\n[bold green]Analiz Tamamlandı![/bold green]")
+    display_results(engine)
 
 if __name__ == "__main__":
     app()
