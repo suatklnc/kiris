@@ -12,8 +12,8 @@
 ## Phase 2: Calculation Engine (Reactions & Internal Forces)
 *Goal: Implement the physics engine to calculate reactions, shear, and moment arrays.*
 
-- [~] Task: Implement `AnalysisEngine` class structure and dependency injection for Beam.
-- [ ] Task: Implement Reaction Force calculation for Point Loads (TDD: Test simple cases).
+- [x] Task: Implement `AnalysisEngine` class structure and dependency injection for Beam. e0f2b75
+- [~] Task: Implement Reaction Force calculation for Point Loads (TDD: Test simple cases).
 - [ ] Task: Implement Reaction Force calculation for UDL (TDD: Test simple cases).
 - [ ] Task: Implement Reaction Force calculation for combined loads (Superposition principle).
 - [ ] Task: Implement Shear Force calculation logic (arrays/functions) (TDD: Verify V(x) values).
