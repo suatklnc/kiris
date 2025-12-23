@@ -3,7 +3,7 @@ import inquirer
 import numpy as np
 from rich.console import Console
 from rich.table import Table
-from beam_analysis.beam import Beam
+from beam_analysis.beam import Beam, Support, SupportType
 from beam_analysis.loads import PointLoad, UDL, PointMoment
 from beam_analysis.plotter import ASCIIPlotter
 
@@ -19,7 +19,9 @@ def display_input_summary(beam, loads):
     table.add_column("Değer", style="magenta")
 
     table.add_row("Kiriş Uzunluğu", f"{beam.length} m")
-    table.add_row("Mesnetler", f"{beam.supports}")
+    
+    for i, support in enumerate(beam.supports):
+        table.add_row(f"Mesnet {i+1}", f"{support.type.name} @ {support.location}m")
 
     for i, load in enumerate(loads):
         if isinstance(load, PointLoad):
@@ -50,8 +52,9 @@ def display_results(engine):
     r_table = Table(title="Mesnet Reaksiyonları")
     r_table.add_column("Konum (m)", style="cyan")
     r_table.add_column("Kuvvet (kN)", style="green")
-    for loc, force in reactions.items():
-        r_table.add_row(f"{loc}", f"{force:.2f}")
+    r_table.add_column("Moment (kNm)", style="magenta")
+    for loc, rx in reactions.items():
+        r_table.add_row(f"{loc}", f"{rx['fy']:.2f}", f"{rx['m']:.2f}")
     console.print(r_table)
 
     # Max Values
@@ -84,17 +87,52 @@ def display_results(engine):
 
 
 def get_beam_info():
-    questions = [
+    q_length = [
         inquirer.Text(
             "length",
             message="Kiriş uzunluğunu girin (m)",
             validate=lambda _, x: float(x) > 0,
         )
     ]
-    answers = inquirer.prompt(questions)
-    length = float(answers["length"])
-    # Basit mesnetli varsayımı: 0 ve L noktalarında mesnetler
-    return Beam(length=length, supports=(0.0, length))
+    ans_length = inquirer.prompt(q_length)
+    length = float(ans_length["length"])
+
+    console.print("\n[bold]Mesnet Bilgilerini Girin[/bold]")
+    
+    q_count = [
+        inquirer.Text(
+            "count",
+            message="Toplam mesnet sayısını girin (Örn: 2)",
+            validate=lambda _, x: x.isdigit() and int(x) >= 1
+        )
+    ]
+    ans_count = inquirer.prompt(q_count)
+    count = int(ans_count["count"])
+    
+    supports = []
+    support_choices = [
+        ("Sabit Mesnet (Pinned) - X,Y Tutulu", SupportType.PINNED),
+        ("Hareketli Mesnet (Roller) - Y Tutulu", SupportType.ROLLER),
+        ("Ankastre Mesnet (Fixed) - X,Y,Moment Tutulu", SupportType.FIXED),
+    ]
+
+    for i in range(count):
+        console.print(f"\n[cyan]--- {i+1}. Mesnet ---[/cyan]")
+        q_support = [
+            inquirer.List("type", message=f"{i+1}. mesnet tipini seçin", choices=support_choices),
+            inquirer.Text(
+                "location", 
+                message=f"{i+1}. mesnet konumunu girin (0 - {length} m arası)", 
+                validate=lambda _, x: 0 <= float(x) <= length
+            )
+        ]
+        ans_support = inquirer.prompt(q_support)
+        supports.append(Support(location=float(ans_support["location"]), type=ans_support["type"]))
+    
+    # Sort supports by location to prevent confusion
+    supports.sort(key=lambda s: s.location)
+
+    return Beam(length=length, supports=supports)
 
 
 def get_loads(beam_length: float):

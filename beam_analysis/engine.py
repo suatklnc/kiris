@@ -21,20 +21,51 @@ class AnalysisEngine:
         """Adds a load to the beam for analysis."""
         self.loads.append(load)
 
-    def calculate_reactions(self) -> Dict[float, float]:
+    def calculate_reactions(self) -> Dict[float, Dict[str, float]]:
         """
-        Calculates the reaction forces at the supports.
-        Only supports two supports (statically determinate beam) for now.
-
+        Calculates the reaction forces and moments at the supports.
+        
         Returns:
-            Dict[float, float]: A dictionary mapping support location to reaction force.
+            Dict[float, Dict[str, float]]: A dictionary mapping support location 
+                                           to a dict of reactions {'fy': force, 'm': moment}.
         """
+        from beam_analysis.beam import SupportType
+        
+        if len(self.beam.supports) == 1:
+            support = self.beam.supports[0]
+            if support.type != SupportType.FIXED:
+                raise ValueError("Single support must be FIXED.")
+            
+            total_vertical_force = 0.0
+            total_moment_at_support = 0.0
+            
+            for load in self.loads:
+                if isinstance(load, PointLoad):
+                    total_vertical_force += load.force
+                    total_moment_at_support += load.force * (load.location - support.location)
+                elif isinstance(load, UDL):
+                    start = load.start
+                    end = load.end if load.end is not None else self.beam.length
+                    end = min(end, self.beam.length)
+                    span_len = end - start
+                    if span_len > 0:
+                        total_load = load.magnitude * span_len
+                        centroid = start + (span_len / 2.0)
+                        total_vertical_force += total_load
+                        total_moment_at_support += total_load * (centroid - support.location)
+                elif isinstance(load, PointMoment):
+                    total_moment_at_support += load.moment
+            
+            # Reaction moment is opposite to the applied moment
+            return {support.location: {'fy': total_vertical_force, 'm': -total_moment_at_support}}
+
         if len(self.beam.supports) != 2:
             raise NotImplementedError(
-                "Only beams with exactly 2 supports are supported."
+                "Currently only 1 fixed support or 2 pinned/roller supports are supported."
             )
 
-        x1, x2 = self.beam.supports
+        s1, s2 = sorted(self.beam.supports, key=lambda s: s.location)
+        x1, x2 = s1.location, s2.location
         l_span = x2 - x1
 
         total_moment_x1 = 0.0
@@ -47,7 +78,6 @@ class AnalysisEngine:
             elif isinstance(load, UDL):
                 start = load.start
                 end = load.end if load.end is not None else self.beam.length
-                # Clamp to beam length just in case
                 end = min(end, self.beam.length)
                 
                 span_len = end - start
@@ -62,7 +92,10 @@ class AnalysisEngine:
         r2 = total_moment_x1 / l_span
         r1 = total_vertical_force - r2
 
-        return {x1: r1, x2: r2}
+        return {
+            x1: {'fy': r1, 'm': 0.0},
+            x2: {'fy': r2, 'm': 0.0}
+        }
 
     def get_shear_force(self, x: float) -> float:
         """
@@ -83,9 +116,9 @@ class AnalysisEngine:
         v = 0.0
 
         # Add reactions to the left of x
-        for support_loc, force in reactions.items():
+        for support_loc, rx in reactions.items():
             if support_loc <= x:
-                v += force
+                v += rx['fy']
 
         # Add loads to the left of x
         for load in self.loads:
@@ -123,9 +156,10 @@ class AnalysisEngine:
         m = 0.0
 
         # Moment from reactions to the left of x
-        for support_loc, force in reactions.items():
+        for support_loc, rx in reactions.items():
             if support_loc <= x:
-                m += force * (x - support_loc)
+                m += rx['fy'] * (x - support_loc)
+                m += rx['m']  # Include reaction moment (like fixed support)
 
         # Moment from loads to the left of x
         for load in self.loads:
@@ -182,7 +216,7 @@ class AnalysisEngine:
         x_points = np.linspace(0, self.beam.length, 1000)
         # Also include load locations and support locations for exact results
         critical_points = set(x_points)
-        critical_points.update(self.beam.supports)
+        critical_points.update([s.location for s in self.beam.supports])
         # Add middle of the beam as it's critical for UDL (legacy)
         critical_points.add(self.beam.length / 2.0)
         for load in self.loads:
