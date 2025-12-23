@@ -2,6 +2,7 @@ import numpy as np
 from typing import List, Dict, Tuple
 from beam_analysis.beam import Beam
 from beam_analysis.loads import Load, PointLoad, UDL, PointMoment
+from beam_analysis.solver import MatrixBeamSolver
 
 
 class AnalysisEngine:
@@ -60,9 +61,9 @@ class AnalysisEngine:
             return {support.location: {'fy': total_vertical_force, 'm': -total_moment_at_support}}
 
         if len(self.beam.supports) != 2:
-            raise NotImplementedError(
-                "Currently only 1 fixed support or 2 pinned/roller supports are supported."
-            )
+            # Use the general matrix stiffness solver for other cases (e.g. indeterminate beams)
+            solver = MatrixBeamSolver(self.beam, self.loads)
+            return solver.solve_reactions()
 
         s1, s2 = sorted(self.beam.supports, key=lambda s: s.location)
         x1, x2 = s1.location, s2.location
