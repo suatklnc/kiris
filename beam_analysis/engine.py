@@ -45,10 +45,17 @@ class AnalysisEngine:
                 total_moment_x1 += load.force * (load.location - x1)
                 total_vertical_force += load.force
             elif isinstance(load, UDL):
-                total_load = load.magnitude * self.beam.length
-                centroid = self.beam.length / 2.0
-                total_moment_x1 += total_load * (centroid - x1)
-                total_vertical_force += total_load
+                start = load.start
+                end = load.end if load.end is not None else self.beam.length
+                # Clamp to beam length just in case
+                end = min(end, self.beam.length)
+                
+                span_len = end - start
+                if span_len > 0:
+                    total_load = load.magnitude * span_len
+                    centroid = start + (span_len / 2.0)
+                    total_moment_x1 += total_load * (centroid - x1)
+                    total_vertical_force += total_load
             elif isinstance(load, PointMoment):
                 total_moment_x1 += load.moment
 
@@ -86,7 +93,14 @@ class AnalysisEngine:
                 if load.location <= x:
                     v -= load.force
             elif isinstance(load, UDL):
-                v -= load.magnitude * x
+                start = load.start
+                end = load.end if load.end is not None else self.beam.length
+                
+                if x > start:
+                    effective_end = min(x, end)
+                    span = effective_end - start
+                    if span > 0:
+                        v -= load.magnitude * span
 
         return v
 
@@ -119,8 +133,16 @@ class AnalysisEngine:
                 if load.location <= x:
                     m -= load.force * (x - load.location)
             elif isinstance(load, UDL):
-                load_portion = load.magnitude * x
-                m -= load_portion * (x / 2.0)
+                start = load.start
+                end = load.end if load.end is not None else self.beam.length
+                
+                if x > start:
+                    effective_end = min(x, end)
+                    span = effective_end - start
+                    if span > 0:
+                        load_portion = load.magnitude * span
+                        centroid = start + (span / 2.0)
+                        m -= load_portion * (x - centroid)
             elif isinstance(load, PointMoment):
                 if load.location <= x:
                     m += load.moment
@@ -161,7 +183,7 @@ class AnalysisEngine:
         # Also include load locations and support locations for exact results
         critical_points = set(x_points)
         critical_points.update(self.beam.supports)
-        # Add middle of the beam as it's critical for UDL
+        # Add middle of the beam as it's critical for UDL (legacy)
         critical_points.add(self.beam.length / 2.0)
         for load in self.loads:
             if isinstance(load, PointLoad):
@@ -170,6 +192,10 @@ class AnalysisEngine:
                 critical_points.add(load.location)
                 if load.location > 0.001:
                     critical_points.add(load.location - 0.001)
+            elif isinstance(load, UDL):
+                critical_points.add(load.start)
+                end = load.end if load.end is not None else self.beam.length
+                critical_points.add(end)
 
         sorted_points = sorted(list(critical_points))
         m_points = [self.get_bending_moment(x) for x in sorted_points]

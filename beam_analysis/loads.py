@@ -33,16 +33,30 @@ class PointLoad(Load):
 @dataclass
 class UDL(Load):
     """
-    A uniformly distributed load applied over the entire beam span.
+    A uniformly distributed load applied over a span of the beam.
 
     Attributes:
         magnitude (float): The magnitude of the load in kN/m. Positive is downwards.
+        start (float): The start location of the load in meters. Defaults to 0.0.
+        end (float | None): The end location of the load in meters. 
+                            If None, it extends to the end of the beam.
     """
 
     magnitude: float
+    start: float = 0.0
+    end: float | None = None
+
+    def __post_init__(self):
+        if self.start < 0:
+            raise ValueError("Start location cannot be negative.")
+        if self.end is not None and self.end < 0:
+            raise ValueError("End location cannot be negative.")
+        if self.end is not None and self.start >= self.end:
+            raise ValueError("Start location must be less than end location.")
 
     def __str__(self):
-        return f"UDL(magnitude={self.magnitude} kN/m)"
+        end_str = f"{self.end} m" if self.end is not None else "End"
+        return f"UDL(magnitude={self.magnitude} kN/m, start={self.start} m, end={end_str})"
 
 
 @dataclass

@@ -20,7 +20,24 @@ def test_udl_initialization():
 
 def test_udl_representation():
     load = UDL(magnitude=5.0)
-    assert str(load) == "UDL(magnitude=5.0 kN/m)"
+    assert str(load) == "UDL(magnitude=5.0 kN/m, start=0.0 m, end=End)"
+
+
+def test_udl_partial_initialization():
+    load = UDL(magnitude=5.0, start=1.0, end=4.0)
+    assert load.magnitude == 5.0
+    assert load.start == 1.0
+    assert load.end == 4.0
+    assert str(load) == "UDL(magnitude=5.0 kN/m, start=1.0 m, end=4.0 m)"
+
+
+def test_udl_invalid_start_end():
+    with pytest.raises(ValueError):
+        UDL(magnitude=5.0, start=-1.0)
+    with pytest.raises(ValueError):
+        UDL(magnitude=5.0, end=-1.0)
+    with pytest.raises(ValueError):
+        UDL(magnitude=5.0, start=5.0, end=2.0)
 
 
 def test_point_load_representation():

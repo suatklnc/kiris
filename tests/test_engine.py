@@ -176,3 +176,29 @@ def test_get_bending_moment_point_moment():
 
     # x=7.5: M = -7.5 + 10 = 2.5
     assert engine.get_bending_moment(7.5) == pytest.approx(2.5)
+
+
+def test_calculate_reactions_udl_partial():
+    from beam_analysis.loads import UDL
+
+    beam = Beam(length=10.0, supports=(0.0, 10.0))
+    engine = AnalysisEngine(beam=beam)
+    # 10kN/m downward UDL from 0m to 5m
+    # Total load = 50kN acting at 2.5m
+    # Moment about A (0): 50 * 2.5 = 125
+    # Rb * 10 = 125 -> Rb = 12.5
+    # Ra + Rb = 50 -> Ra = 37.5
+    engine.add_load(UDL(magnitude=10.0, start=0.0, end=5.0))
+    reactions = engine.calculate_reactions()
+    
+    assert reactions[0.0] == pytest.approx(37.5)
+    assert reactions[10.0] == pytest.approx(12.5)
+    
+    # Check shear force at x=2.5 (middle of load)
+    # V = Ra - 10 * 2.5 = 37.5 - 25 = 12.5
+    assert engine.get_shear_force(2.5) == pytest.approx(12.5)
+    
+    # Check shear force at x=7.5 (after load)
+    # V = Ra - TotalLoad = 37.5 - 50 = -12.5
+    assert engine.get_shear_force(7.5) == pytest.approx(-12.5)
+
