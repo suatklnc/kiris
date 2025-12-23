@@ -73,6 +73,10 @@ def display_results(engine):
 
     # Diagrams
     plotter = ASCIIPlotter(width=console.width - 10 if console.width > 20 else 60)
+    
+    # Beam Schematic
+    console.print(plotter.plot_beam_schematic(engine.beam, engine.loads))
+    
     x_points = np.linspace(0, engine.beam.length, 200)
 
     v_points = np.array([engine.get_shear_force(x) for x in x_points])

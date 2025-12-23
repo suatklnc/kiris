@@ -1,5 +1,9 @@
 import numpy as np
 from rich.panel import Panel
+from rich.table import Table
+from rich.console import Group
+from beam_analysis.beam import Beam, SupportType
+from beam_analysis.loads import PointLoad, UDL, PointMoment
 
 
 class ASCIIPlotter:
@@ -11,6 +15,69 @@ class ASCIIPlotter:
     def __init__(self, width: int = 60, height: int = 15):
         self.width = width
         self.height = height
+
+    def plot_beam_schematic(self, beam: Beam, loads: list) -> Panel:
+        """
+        Creates a schematic representation of the beam, supports, and loads.
+        """
+        grid_height = 5
+        grid = [[" " for _ in range(self.width)] for _ in range(grid_height)]
+        beam_y = 2  # Middle row for beam line
+
+        # Draw beam line
+        for x in range(self.width):
+            grid[beam_y][x] = "═"
+
+        # Helper to scale x to grid x
+        def get_grid_x(location: float):
+            val = int((location / beam.length) * (self.width - 1))
+            return max(0, min(self.width - 1, val))
+
+        # Draw Supports
+        for support in beam.supports:
+            gx = get_grid_x(support.location)
+            if support.type == SupportType.PINNED:
+                grid[beam_y + 1][gx] = "▲"  # Support point
+                grid[beam_y + 2][gx] = "┴"  # Base
+            elif support.type == SupportType.ROLLER:
+                grid[beam_y + 1][gx] = "○"  # Roller
+                grid[beam_y + 2][gx] = "─"  # Ground
+            elif support.type == SupportType.FIXED:
+                # Vertical wall
+                if support.location == 0:
+                    grid[beam_y - 1][gx] = "│"
+                    grid[beam_y][gx] = "├"
+                    grid[beam_y + 1][gx] = "│"
+                elif support.location == beam.length:
+                    grid[beam_y - 1][gx] = "│"
+                    grid[beam_y][gx] = "┤"
+                    grid[beam_y + 1][gx] = "│"
+                else:
+                    # Fixed inside (less common, show as clamped block)
+                    grid[beam_y][gx] = "█"
+                    grid[beam_y + 1][gx] = "┴"
+
+        # Draw Loads (Simplified)
+        for load in loads:
+            if isinstance(load, PointLoad):
+                gx = get_grid_x(load.location)
+                if load.force > 0: # Downward
+                    grid[beam_y - 1][gx] = "↓"
+                else: # Upward
+                    grid[beam_y + 1][gx] = "↑"
+            elif isinstance(load, PointMoment):
+                gx = get_grid_x(load.location)
+                grid[beam_y - 1][gx] = "↻" if load.moment > 0 else "↺"
+            elif isinstance(load, UDL):
+                start_gx = get_grid_x(load.start)
+                end = load.end if load.end is not None else beam.length
+                end_gx = get_grid_x(end)
+                for x in range(start_gx, end_gx + 1):
+                    grid[beam_y - 1][x] = "w"
+
+        plot_str = "\n".join(["".join(row) for row in grid])
+        legend = "\n[bold]Legend:[/bold] ▲=Pinned, ○=Roller, │=Fixed, ↓=Point Load, w=UDL, ↻=Moment"
+        return Panel(plot_str + legend, title="Kiriş Şeması (Beam Schematic)", expand=False)
 
     def plot(self, x_points: np.ndarray, y_points: np.ndarray, title: str) -> Panel:
         """
