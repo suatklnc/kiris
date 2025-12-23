@@ -3,14 +3,16 @@ from typing import List, Dict, Tuple
 from beam_analysis.beam import Beam
 from beam_analysis.loads import Load, PointLoad, UDL
 
+
 class AnalysisEngine:
     """
     The core calculation engine for beam analysis.
-    
+
     Attributes:
         beam (Beam): The beam to be analyzed.
         loads (List[Load]): A list of loads applied to the beam.
     """
+
     def __init__(self, beam: Beam):
         self.beam = beam
         self.loads: List[Load] = []
@@ -23,16 +25,18 @@ class AnalysisEngine:
         """
         Calculates the reaction forces at the supports.
         Only supports two supports (statically determinate beam) for now.
-        
+
         Returns:
             Dict[float, float]: A dictionary mapping support location to reaction force.
         """
         if len(self.beam.supports) != 2:
-            raise NotImplementedError("Only beams with exactly 2 supports are supported.")
-        
+            raise NotImplementedError(
+                "Only beams with exactly 2 supports are supported."
+            )
+
         x1, x2 = self.beam.supports
         l_span = x2 - x1
-        
+
         total_moment_x1 = 0.0
         total_vertical_force = 0.0
 
@@ -45,33 +49,35 @@ class AnalysisEngine:
                 centroid = self.beam.length / 2.0
                 total_moment_x1 += total_load * (centroid - x1)
                 total_vertical_force += total_load
-        
+
         r2 = -total_moment_x1 / l_span
         r1 = -total_vertical_force - r2
-        
+
         return {x1: r1, x2: r2}
 
     def get_shear_force(self, x: float) -> float:
         """
         Calculates the shear force at position x from the left end of the beam.
-        
+
         Args:
             x (float): Position along the beam (0 to length).
-            
+
         Returns:
             float: Shear force in kN.
         """
         if x < 0 or x > self.beam.length:
-            raise ValueError(f"Position x={x} is outside the beam limits (0 to {self.beam.length}).")
+            raise ValueError(
+                f"Position x={x} is outside the beam limits (0 to {self.beam.length})."
+            )
 
         reactions = self.calculate_reactions()
         v = 0.0
-        
+
         # Add reactions to the left of x
         for support_loc, force in reactions.items():
             if support_loc <= x:
                 v += force
-                
+
         # Add loads to the left of x
         for load in self.loads:
             if isinstance(load, PointLoad):
@@ -79,30 +85,32 @@ class AnalysisEngine:
                     v += load.force
             elif isinstance(load, UDL):
                 v += load.magnitude * x
-                
+
         return v
 
     def get_bending_moment(self, x: float) -> float:
         """
         Calculates the bending moment at position x from the left end of the beam.
-        
+
         Args:
             x (float): Position along the beam (0 to length).
-            
+
         Returns:
             float: Bending moment in kNm.
         """
         if x < 0 or x > self.beam.length:
-            raise ValueError(f"Position x={x} is outside the beam limits (0 to {self.beam.length}).")
+            raise ValueError(
+                f"Position x={x} is outside the beam limits (0 to {self.beam.length})."
+            )
 
         reactions = self.calculate_reactions()
         m = 0.0
-        
+
         # Moment from reactions to the left of x
         for support_loc, force in reactions.items():
             if support_loc <= x:
                 m += force * (x - support_loc)
-                
+
         # Moment from loads to the left of x
         for load in self.loads:
             if isinstance(load, PointLoad):
@@ -111,36 +119,36 @@ class AnalysisEngine:
             elif isinstance(load, UDL):
                 load_portion = load.magnitude * x
                 m += load_portion * (x / 2.0)
-                
+
         return m
 
     def get_max_shear_info(self) -> Tuple[float, float]:
         """
         Finds the maximum shear force and its location.
-        
+
         Returns:
             Tuple[float, float]: (max_shear_value, location_x)
         """
         x_points = np.linspace(0, self.beam.length, 1000)
         v_points = [self.get_shear_force(x) for x in x_points]
-        
+
         # For point loads, we should also check just before the load location
         for load in self.loads:
             if isinstance(load, PointLoad):
                 if load.location > 0.001:
                     v_points.append(self.get_shear_force(load.location - 0.001))
                 v_points.append(self.get_shear_force(load.location))
-        
+
         v_abs = [abs(v) for v in v_points]
         max_idx = np.argmax(v_abs)
         # Simplified: if multiple max, we just take one.
         # This is a bit rough for location, but good enough for MVP.
-        return v_points[max_idx], x_points[min(max_idx, len(x_points)-1)]
+        return v_points[max_idx], x_points[min(max_idx, len(x_points) - 1)]
 
     def get_max_moment_info(self) -> Tuple[float, float]:
         """
         Finds the maximum bending moment and its location.
-        
+
         Returns:
             Tuple[float, float]: (max_moment_value, location_x)
         """
@@ -153,10 +161,10 @@ class AnalysisEngine:
         for load in self.loads:
             if isinstance(load, PointLoad):
                 critical_points.add(load.location)
-        
+
         sorted_points = sorted(list(critical_points))
         m_points = [self.get_bending_moment(x) for x in sorted_points]
-        
+
         m_abs = [abs(m) for m in m_points]
         max_idx = np.argmax(m_abs)
         return m_points[max_idx], sorted_points[max_idx]
