@@ -5,8 +5,8 @@
 
 - [x] Task: Initialize Poetry project and install dependencies (numpy, scipy, rich, inquirer, typer, pytest, black, flake8). a50a9ea
 - [x] Task: Configure project settings (pyproject.toml, pytest.ini, linter configs). 4afb632
-- [~] Task: Create `Load` base class and `PointLoad`, `UDL` subclasses (TDD: Write tests first for attributes and validation).
-- [ ] Task: Create `Beam` class with length and support properties (TDD: Write tests first for initialization and validation).
+- [x] Task: Create `Load` base class and `PointLoad`, `UDL` subclasses (TDD: Write tests first for attributes and validation). 0317836
+- [~] Task: Create `Beam` class with length and support properties (TDD: Write tests first for initialization and validation).
 - [ ] Task: Conductor - User Manual Verification 'Phase 1: Project Skeleton & Core Data Structures' (Protocol in workflow.md)
 
 ## Phase 2: Calculation Engine (Reactions & Internal Forces)
