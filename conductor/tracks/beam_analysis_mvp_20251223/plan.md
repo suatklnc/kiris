@@ -24,9 +24,9 @@
 ## Phase 3: CLI Wizard & Input Handling
 *Goal: Build the interactive command-line interface for data entry.*
 
-- [~] Task: Set up `typer` application entry point.
-- [ ] Task: Implement `inquirer`/`rich` prompt for Beam Length input with validation.
-- [ ] Task: Implement interactive loop for adding multiple Loads (Point/UDL).
+- [x] Task: Set up `typer` application entry point. 376c602
+- [x] Task: Implement `inquirer`/`rich` prompt for Beam Length input with validation. 376c602
+- [~] Task: Implement interactive loop for adding multiple Loads (Point/UDL).
 - [ ] Task: Implement input summary display using `rich.table`.
 - [ ] Task: Connect CLI inputs to the `Beam` and `AnalysisEngine` classes.
 - [ ] Task: Conductor - User Manual Verification 'Phase 3: CLI Wizard & Input Handling' (Protocol in workflow.md)
