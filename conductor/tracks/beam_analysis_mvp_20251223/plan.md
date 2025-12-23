@@ -4,8 +4,8 @@
 *Goal: Set up the project structure, dependency management, and define the core classes for Beam and Loads.*
 
 - [x] Task: Initialize Poetry project and install dependencies (numpy, scipy, rich, inquirer, typer, pytest, black, flake8). a50a9ea
-- [ ] Task: Configure project settings (pyproject.toml, pytest.ini, linter configs).
-- [ ] Task: Create `Load` base class and `PointLoad`, `UDL` subclasses (TDD: Write tests first for attributes and validation).
+- [x] Task: Configure project settings (pyproject.toml, pytest.ini, linter configs). 4afb632
+- [~] Task: Create `Load` base class and `PointLoad`, `UDL` subclasses (TDD: Write tests first for attributes and validation).
 - [ ] Task: Create `Beam` class with length and support properties (TDD: Write tests first for initialization and validation).
 - [ ] Task: Conductor - User Manual Verification 'Phase 1: Project Skeleton & Core Data Structures' (Protocol in workflow.md)
 
