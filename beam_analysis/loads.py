@@ -15,7 +15,7 @@ class PointLoad(Load):
     A point load applied at a specific location on the beam.
 
     Attributes:
-        force (float): The magnitude of the force in kN. Positive is upwards.
+        force (float): The magnitude of the force in kN. Positive is downwards.
         location (float): The location of the load in meters from the left support.
     """
 
@@ -36,7 +36,7 @@ class UDL(Load):
     A uniformly distributed load applied over the entire beam span.
 
     Attributes:
-        magnitude (float): The magnitude of the load in kN/m. Positive is upwards.
+        magnitude (float): The magnitude of the load in kN/m. Positive is downwards.
     """
 
     magnitude: float

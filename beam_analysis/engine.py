@@ -50,8 +50,8 @@ class AnalysisEngine:
                 total_moment_x1 += total_load * (centroid - x1)
                 total_vertical_force += total_load
 
-        r2 = -total_moment_x1 / l_span
-        r1 = -total_vertical_force - r2
+        r2 = total_moment_x1 / l_span
+        r1 = total_vertical_force - r2
 
         return {x1: r1, x2: r2}
 
@@ -82,9 +82,9 @@ class AnalysisEngine:
         for load in self.loads:
             if isinstance(load, PointLoad):
                 if load.location <= x:
-                    v += load.force
+                    v -= load.force
             elif isinstance(load, UDL):
-                v += load.magnitude * x
+                v -= load.magnitude * x
 
         return v
 
@@ -115,10 +115,10 @@ class AnalysisEngine:
         for load in self.loads:
             if isinstance(load, PointLoad):
                 if load.location <= x:
-                    m += load.force * (x - load.location)
+                    m -= load.force * (x - load.location)
             elif isinstance(load, UDL):
                 load_portion = load.magnitude * x
-                m += load_portion * (x / 2.0)
+                m -= load_portion * (x / 2.0)
 
         return m
 

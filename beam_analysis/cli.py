@@ -110,7 +110,7 @@ def get_loads(beam_length: float):
             q_point = [
                 inquirer.Text(
                     "force",
-                    message="Yük miktarını girin (kN, aşağı yönlü için negatif)",
+                    message="Yük miktarını girin (kN, aşağı yönlü için pozitif)",
                     validate=lambda _, x: x.replace("-", "", 1)
                     .replace(".", "", 1)
                     .isdigit(),
@@ -133,7 +133,7 @@ def get_loads(beam_length: float):
             q_udl = [
                 inquirer.Text(
                     "magnitude",
-                    message="UDL miktarını girin (kN/m, aşağı yönlü için negatif)",
+                    message="UDL miktarını girin (kN/m, aşağı yönlü için pozitif)",
                     validate=lambda _, x: x.replace("-", "", 1)
                     .replace(".", "", 1)
                     .isdigit(),

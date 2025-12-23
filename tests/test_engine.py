@@ -15,7 +15,7 @@ def test_engine_add_load():
 
     beam = Beam(length=10.0, supports=(0.0, 10.0))
     engine = AnalysisEngine(beam=beam)
-    load = PointLoad(force=-10.0, location=5.0)
+    load = PointLoad(force=10.0, location=5.0)
     engine.add_load(load)
     assert len(engine.loads) == 1
     assert engine.loads[0] == load
@@ -28,7 +28,7 @@ def test_calculate_reactions_point_load_center():
     beam = Beam(length=10.0, supports=(0.0, 10.0))
     engine = AnalysisEngine(beam=beam)
     # 10kN downward load at 5m
-    load = PointLoad(force=-10.0, location=5.0)
+    load = PointLoad(force=10.0, location=5.0)
     engine.add_load(load)
     reactions = engine.calculate_reactions()
     # Expect 5kN upward at each support
@@ -42,7 +42,7 @@ def test_calculate_reactions_point_load_off_center():
     beam = Beam(length=10.0, supports=(0.0, 10.0))
     engine = AnalysisEngine(beam=beam)
     # 10kN downward load at 2.5m (1/4 of the way)
-    load = PointLoad(force=-10.0, location=2.5)
+    load = PointLoad(force=10.0, location=2.5)
     engine.add_load(load)
     reactions = engine.calculate_reactions()
     # Ra (at 0) should be 7.5kN, Rb (at 10) should be 2.5kN
@@ -56,7 +56,7 @@ def test_calculate_reactions_udl_full_span():
     beam = Beam(length=10.0, supports=(0.0, 10.0))
     engine = AnalysisEngine(beam=beam)
     # 5kN/m downward UDL over 10m
-    load = UDL(magnitude=-5.0)
+    load = UDL(magnitude=5.0)
     engine.add_load(load)
     reactions = engine.calculate_reactions()
     # Total load is 50kN, Ra and Rb should be 25kN each
@@ -70,9 +70,9 @@ def test_calculate_reactions_combined_loads():
     beam = Beam(length=10.0, supports=(0.0, 10.0))
     engine = AnalysisEngine(beam=beam)
     # 10kN downward point load at 5m
-    engine.add_load(PointLoad(force=-10.0, location=5.0))
+    engine.add_load(PointLoad(force=10.0, location=5.0))
     # 5kN/m downward UDL over 10m
-    engine.add_load(UDL(magnitude=-5.0))
+    engine.add_load(UDL(magnitude=5.0))
     reactions = engine.calculate_reactions()
     # Ra and Rb should be (10 + 50) / 2 = 30kN each
     assert reactions[0.0] == pytest.approx(30.0)
@@ -84,7 +84,7 @@ def test_get_shear_force_point_load():
 
     beam = Beam(length=10.0, supports=(0.0, 10.0))
     engine = AnalysisEngine(beam=beam)
-    engine.add_load(PointLoad(force=-10.0, location=5.0))
+    engine.add_load(PointLoad(force=10.0, location=5.0))
     # Before load: V = Ra = 5
     assert engine.get_shear_force(2.5) == pytest.approx(5.0)
     # After load: V = Ra - 10 = -5
@@ -96,7 +96,7 @@ def test_get_shear_force_udl():
 
     beam = Beam(length=10.0, supports=(0.0, 10.0))
     engine = AnalysisEngine(beam=beam)
-    engine.add_load(UDL(magnitude=-5.0))
+    engine.add_load(UDL(magnitude=5.0))
     # Ra = 25
     # x=0: V = 25
     assert engine.get_shear_force(0.0) == pytest.approx(25.0)
@@ -110,7 +110,7 @@ def test_get_bending_moment_point_load():
 
     beam = Beam(length=10.0, supports=(0.0, 10.0))
     engine = AnalysisEngine(beam=beam)
-    engine.add_load(PointLoad(force=-10.0, location=5.0))
+    engine.add_load(PointLoad(force=10.0, location=5.0))
     # x=2.5: M = Ra * 2.5 = 5 * 2.5 = 12.5
     assert engine.get_bending_moment(2.5) == pytest.approx(12.5)
     # x=5: M = Ra * 5 = 25
@@ -124,7 +124,7 @@ def test_get_bending_moment_udl():
 
     beam = Beam(length=10.0, supports=(0.0, 10.0))
     engine = AnalysisEngine(beam=beam)
-    engine.add_load(UDL(magnitude=-5.0))
+    engine.add_load(UDL(magnitude=5.0))
     # Max Moment at x=5: wL^2/8 = 5 * 100 / 8 = 62.5
     assert engine.get_bending_moment(5.0) == pytest.approx(62.5)
     # x=0: M = 0
@@ -136,7 +136,7 @@ def test_get_max_values_udl():
 
     beam = Beam(length=10.0, supports=(0.0, 10.0))
     engine = AnalysisEngine(beam=beam)
-    engine.add_load(UDL(magnitude=-5.0))
+    engine.add_load(UDL(magnitude=5.0))
 
     max_v_val, max_v_x = engine.get_max_shear_info()
     # Max V is 25kN at x=0 or x=10
