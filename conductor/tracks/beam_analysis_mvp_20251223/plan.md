@@ -26,10 +26,10 @@
 
 - [x] Task: Set up `typer` application entry point. 376c602
 - [x] Task: Implement `inquirer`/`rich` prompt for Beam Length input with validation. 376c602
-- [~] Task: Implement interactive loop for adding multiple Loads (Point/UDL).
-- [ ] Task: Implement input summary display using `rich.table`.
-- [ ] Task: Connect CLI inputs to the `Beam` and `AnalysisEngine` classes.
-- [ ] Task: Conductor - User Manual Verification 'Phase 3: CLI Wizard & Input Handling' (Protocol in workflow.md)
+- [x] Task: Implement interactive loop for adding multiple Loads (Point/UDL). 3875c48
+- [x] Task: Implement input summary display using `rich.table`. 3875c48
+- [x] Task: Connect CLI inputs to the `Beam` and `AnalysisEngine` classes. 3875c48
+- [~] Task: Conductor - User Manual Verification 'Phase 3: CLI Wizard & Input Handling' (Protocol in workflow.md)
 
 ## Phase 4: Visualization & Reporting
 *Goal: Display results and draw diagrams in the terminal.*
