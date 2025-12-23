@@ -26,7 +26,13 @@ Bu proje [Poetry](https://python-poetry.org/) kullanılarak geliştirilmiştir.
 
 ## Kullanım
 
-Uygulamayı başlatmak için proje dizininde şu komutu çalıştırın:
+Uygulamayı hızlıca başlatmak için proje dizininde şu komutu çalıştırabilirsiniz:
+
+```bash
+./run
+```
+
+Alternatif olarak, Poetry ile manuel çalıştırmak isterseniz:
 
 ```bash
 poetry run python beam_analysis/cli.py
