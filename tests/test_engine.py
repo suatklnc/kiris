@@ -110,3 +110,18 @@ def test_get_bending_moment_udl():
     assert engine.get_bending_moment(5.0) == pytest.approx(62.5)
     # x=0: M = 0
     assert engine.get_bending_moment(0.0) == pytest.approx(0.0)
+
+def test_get_max_values_udl():
+    from beam_analysis.loads import UDL
+    beam = Beam(length=10.0, supports=(0.0, 10.0))
+    engine = AnalysisEngine(beam=beam)
+    engine.add_load(UDL(magnitude=-5.0))
+    
+    max_v_val, max_v_x = engine.get_max_shear_info()
+    # Max V is 25kN at x=0 or x=10
+    assert abs(max_v_val) == pytest.approx(25.0)
+    
+    max_m_val, max_m_x = engine.get_max_moment_info()
+    # Max M is 62.5kNm at x=5
+    assert max_m_val == pytest.approx(62.5)
+    assert max_m_x == pytest.approx(5.0)

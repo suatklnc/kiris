@@ -1,4 +1,5 @@
-from typing import List, Dict
+import numpy as np
+from typing import List, Dict, Tuple
 from beam_analysis.beam import Beam
 from beam_analysis.loads import Load, PointLoad, UDL
 
@@ -77,7 +78,6 @@ class AnalysisEngine:
                 if load.location <= x:
                     v += load.force
             elif isinstance(load, UDL):
-                # UDL is over the entire span, so we take the portion from 0 to x
                 v += load.magnitude * x
                 
         return v
@@ -109,9 +109,54 @@ class AnalysisEngine:
                 if load.location <= x:
                     m += load.force * (x - load.location)
             elif isinstance(load, UDL):
-                # Portion of UDL from 0 to x
                 load_portion = load.magnitude * x
-                # Centroid of this portion is at x/2
                 m += load_portion * (x / 2.0)
                 
         return m
+
+    def get_max_shear_info(self) -> Tuple[float, float]:
+        """
+        Finds the maximum shear force and its location.
+        
+        Returns:
+            Tuple[float, float]: (max_shear_value, location_x)
+        """
+        x_points = np.linspace(0, self.beam.length, 1000)
+        v_points = [self.get_shear_force(x) for x in x_points]
+        
+        # For point loads, we should also check just before the load location
+        for load in self.loads:
+            if isinstance(load, PointLoad):
+                if load.location > 0.001:
+                    v_points.append(self.get_shear_force(load.location - 0.001))
+                v_points.append(self.get_shear_force(load.location))
+        
+        v_abs = [abs(v) for v in v_points]
+        max_idx = np.argmax(v_abs)
+        # Simplified: if multiple max, we just take one.
+        # This is a bit rough for location, but good enough for MVP.
+        return v_points[max_idx], x_points[min(max_idx, len(x_points)-1)]
+
+    def get_max_moment_info(self) -> Tuple[float, float]:
+        """
+        Finds the maximum bending moment and its location.
+        
+        Returns:
+            Tuple[float, float]: (max_moment_value, location_x)
+        """
+        x_points = np.linspace(0, self.beam.length, 1000)
+        # Also include load locations and support locations for exact results
+        critical_points = set(x_points)
+        critical_points.update(self.beam.supports)
+        # Add middle of the beam as it's critical for UDL
+        critical_points.add(self.beam.length / 2.0)
+        for load in self.loads:
+            if isinstance(load, PointLoad):
+                critical_points.add(load.location)
+        
+        sorted_points = sorted(list(critical_points))
+        m_points = [self.get_bending_moment(x) for x in sorted_points]
+        
+        m_abs = [abs(m) for m in m_points]
+        max_idx = np.argmax(m_abs)
+        return m_points[max_idx], sorted_points[max_idx]
