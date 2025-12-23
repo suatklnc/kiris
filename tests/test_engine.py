@@ -66,3 +66,27 @@ def test_calculate_reactions_combined_loads():
     # Ra and Rb should be (10 + 50) / 2 = 30kN each
     assert reactions[0.0] == pytest.approx(30.0)
     assert reactions[10.0] == pytest.approx(30.0)
+
+def test_get_shear_force_point_load():
+    from beam_analysis.loads import PointLoad
+    beam = Beam(length=10.0, supports=(0.0, 10.0))
+    engine = AnalysisEngine(beam=beam)
+    engine.add_load(PointLoad(force=-10.0, location=5.0))
+    # Before load: V = Ra = 5
+    assert engine.get_shear_force(2.5) == pytest.approx(5.0)
+    # After load: V = Ra - 10 = -5
+    assert engine.get_shear_force(7.5) == pytest.approx(-5.0)
+
+def test_get_shear_force_udl():
+    from beam_analysis.loads import UDL
+    beam = Beam(length=10.0, supports=(0.0, 10.0))
+    engine = AnalysisEngine(beam=beam)
+    engine.add_load(UDL(magnitude=-5.0))
+    # Ra = 25
+    # x=0: V = 25
+    assert engine.get_shear_force(0.0) == pytest.approx(25.0)
+    # x=5: V = 25 - 5*5 = 0
+    assert engine.get_shear_force(5.0) == pytest.approx(0.0)
+    # x=10: V = Ra - UDL*10 = 25 - 50 = -25 (just before Rb)
+    # Note: at exactly 10.0, Rb is also added, so it becomes 0.
+    assert engine.get_shear_force(9.999) == pytest.approx(-25.0, abs=1e-2)

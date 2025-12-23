@@ -40,9 +40,7 @@ class AnalysisEngine:
                 total_moment_x1 += load.force * (load.location - x1)
                 total_vertical_force += load.force
             elif isinstance(load, UDL):
-                # UDL is over the entire beam length
                 total_load = load.magnitude * self.beam.length
-                # Centroid of full-span UDL is at length/2
                 centroid = self.beam.length / 2.0
                 total_moment_x1 += total_load * (centroid - x1)
                 total_vertical_force += total_load
@@ -51,3 +49,35 @@ class AnalysisEngine:
         r1 = -total_vertical_force - r2
         
         return {x1: r1, x2: r2}
+
+    def get_shear_force(self, x: float) -> float:
+        """
+        Calculates the shear force at position x from the left end of the beam.
+        
+        Args:
+            x (float): Position along the beam (0 to length).
+            
+        Returns:
+            float: Shear force in kN.
+        """
+        if x < 0 or x > self.beam.length:
+            raise ValueError(f"Position x={x} is outside the beam limits (0 to {self.beam.length}).")
+
+        reactions = self.calculate_reactions()
+        v = 0.0
+        
+        # Add reactions to the left of x
+        for support_loc, force in reactions.items():
+            if support_loc <= x:
+                v += force
+                
+        # Add loads to the left of x
+        for load in self.loads:
+            if isinstance(load, PointLoad):
+                if load.location <= x:
+                    v += load.force
+            elif isinstance(load, UDL):
+                # UDL is over the entire span, so we take the portion from 0 to x
+                v += load.magnitude * x
+                
+        return v
