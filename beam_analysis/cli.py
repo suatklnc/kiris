@@ -24,6 +24,32 @@ def display_input_summary(beam, loads):
             
     console.print(table)
 
+def display_results(engine):
+    console.print("\n[bold]Analiz Sonuçları[/bold]")
+    
+    # Reactions
+    reactions = engine.calculate_reactions()
+    r_table = Table(title="Mesnet Reaksiyonları")
+    r_table.add_column("Konum (m)", style="cyan")
+    r_table.add_column("Kuvvet (kN)", style="green")
+    for loc, force in reactions.items():
+        r_table.add_row(f"{loc}", f"{force:.2f}")
+    console.print(r_table)
+    
+    # Max Values
+    max_v, x_v = engine.get_max_shear_info()
+    max_m, x_m = engine.get_max_moment_info()
+    
+    m_table = Table(title="Kritik Değerler")
+    m_table.add_column("Parametre", style="cyan")
+    m_table.add_column("Değer", style="magenta")
+    m_table.add_column("Konum (m)", style="yellow")
+    
+    m_table.add_row("Maksimum Kesme (Vmax)", f"{abs(max_v):.2f} kN", f"{x_v:.2f}")
+    m_table.add_row("Maksimum Moment (Mmax)", f"{max_m:.2f} kNm", f"{x_m:.2f}")
+    
+    console.print(m_table)
+
 def get_beam_info():
     questions = [
         inquirer.Text('length', message="Kiriş uzunluğunu girin (m)", validate=lambda _, x: float(x) > 0)
