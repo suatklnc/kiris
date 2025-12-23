@@ -34,8 +34,8 @@
 ## Phase 4: Visualization & Reporting
 *Goal: Display results and draw diagrams in the terminal.*
 
-- [~] Task: Implement Result Reporter module to display Reactions and Max values using `rich`.
-- [ ] Task: Create ASCII Plotter utility for Shear Force Diagram (SFD) (Normalize data to terminal height/width).
+- [x] Task: Implement Result Reporter module to display Reactions and Max values using `rich`. 07af604
+- [~] Task: Create ASCII Plotter utility for Shear Force Diagram (SFD) (Normalize data to terminal height/width).
 - [ ] Task: Create ASCII Plotter utility for Bending Moment Diagram (BMD).
 - [ ] Task: Integrate plotting into the main CLI flow.
 - [ ] Task: Add color coding to diagrams (e.g., Red for negative, Green for positive, Bold for max values).
