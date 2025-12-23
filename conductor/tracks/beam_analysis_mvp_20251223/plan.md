@@ -9,7 +9,7 @@
 - [x] Task: Create `Beam` class with length and support properties (TDD: Write tests first for initialization and validation). 2fecafe
 - [x] Task: Conductor - User Manual Verification 'Phase 1: Project Skeleton & Core Data Structures' (Protocol in workflow.md)
 
-## Phase 2: Calculation Engine (Reactions & Internal Forces)
+## Phase 2: Calculation Engine (Reactions & Internal Forces) [checkpoint: 8e7898a]
 *Goal: Implement the physics engine to calculate reactions, shear, and moment arrays.*
 
 - [x] Task: Implement `AnalysisEngine` class structure and dependency injection for Beam. e0f2b75
@@ -19,12 +19,12 @@
 - [x] Task: Implement Shear Force calculation logic (arrays/functions) (TDD: Verify V(x) values). d1e2f76
 - [x] Task: Implement Bending Moment calculation logic (arrays/functions) (TDD: Verify M(x) values). 132c1f8
 - [x] Task: Implement `get_max_shear` and `get_max_moment` helper methods. 3defc48
-- [~] Task: Conductor - User Manual Verification 'Phase 2: Calculation Engine (Reactions & Internal Forces)' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 2: Calculation Engine (Reactions & Internal Forces)' (Protocol in workflow.md)
 
 ## Phase 3: CLI Wizard & Input Handling
 *Goal: Build the interactive command-line interface for data entry.*
 
-- [ ] Task: Set up `typer` application entry point.
+- [~] Task: Set up `typer` application entry point.
 - [ ] Task: Implement `inquirer`/`rich` prompt for Beam Length input with validation.
 - [ ] Task: Implement interactive loop for adding multiple Loads (Point/UDL).
 - [ ] Task: Implement input summary display using `rich.table`.
