@@ -21,7 +21,7 @@
 - [x] Task: Implement `get_max_shear` and `get_max_moment` helper methods. 3defc48
 - [x] Task: Conductor - User Manual Verification 'Phase 2: Calculation Engine (Reactions & Internal Forces)' (Protocol in workflow.md)
 
-## Phase 3: CLI Wizard & Input Handling
+## Phase 3: CLI Wizard & Input Handling [checkpoint: 02b4915]
 *Goal: Build the interactive command-line interface for data entry.*
 
 - [x] Task: Set up `typer` application entry point. 376c602
@@ -29,12 +29,12 @@
 - [x] Task: Implement interactive loop for adding multiple Loads (Point/UDL). 3875c48
 - [x] Task: Implement input summary display using `rich.table`. 3875c48
 - [x] Task: Connect CLI inputs to the `Beam` and `AnalysisEngine` classes. 3875c48
-- [~] Task: Conductor - User Manual Verification 'Phase 3: CLI Wizard & Input Handling' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 3: CLI Wizard & Input Handling' (Protocol in workflow.md)
 
 ## Phase 4: Visualization & Reporting
 *Goal: Display results and draw diagrams in the terminal.*
 
-- [ ] Task: Implement Result Reporter module to display Reactions and Max values using `rich`.
+- [~] Task: Implement Result Reporter module to display Reactions and Max values using `rich`.
 - [ ] Task: Create ASCII Plotter utility for Shear Force Diagram (SFD) (Normalize data to terminal height/width).
 - [ ] Task: Create ASCII Plotter utility for Bending Moment Diagram (BMD).
 - [ ] Task: Integrate plotting into the main CLI flow.
