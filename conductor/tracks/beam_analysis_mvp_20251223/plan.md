@@ -13,8 +13,8 @@
 *Goal: Implement the physics engine to calculate reactions, shear, and moment arrays.*
 
 - [x] Task: Implement `AnalysisEngine` class structure and dependency injection for Beam. e0f2b75
-- [~] Task: Implement Reaction Force calculation for Point Loads (TDD: Test simple cases).
-- [ ] Task: Implement Reaction Force calculation for UDL (TDD: Test simple cases).
+- [x] Task: Implement Reaction Force calculation for Point Loads (TDD: Test simple cases). c0fcbef
+- [~] Task: Implement Reaction Force calculation for UDL (TDD: Test simple cases).
 - [ ] Task: Implement Reaction Force calculation for combined loads (Superposition principle).
 - [ ] Task: Implement Shear Force calculation logic (arrays/functions) (TDD: Verify V(x) values).
 - [ ] Task: Implement Bending Moment calculation logic (arrays/functions) (TDD: Verify M(x) values).
