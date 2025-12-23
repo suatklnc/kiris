@@ -1,7 +1,7 @@
 import numpy as np
 from typing import List, Dict, Tuple
 from beam_analysis.beam import Beam
-from beam_analysis.loads import Load, PointLoad, UDL
+from beam_analysis.loads import Load, PointLoad, UDL, PointMoment
 
 
 class AnalysisEngine:
@@ -49,6 +49,8 @@ class AnalysisEngine:
                 centroid = self.beam.length / 2.0
                 total_moment_x1 += total_load * (centroid - x1)
                 total_vertical_force += total_load
+            elif isinstance(load, PointMoment):
+                total_moment_x1 += load.moment
 
         r2 = total_moment_x1 / l_span
         r1 = total_vertical_force - r2
@@ -119,6 +121,9 @@ class AnalysisEngine:
             elif isinstance(load, UDL):
                 load_portion = load.magnitude * x
                 m -= load_portion * (x / 2.0)
+            elif isinstance(load, PointMoment):
+                if load.location <= x:
+                    m += load.moment
 
         return m
 
@@ -161,6 +166,10 @@ class AnalysisEngine:
         for load in self.loads:
             if isinstance(load, PointLoad):
                 critical_points.add(load.location)
+            elif isinstance(load, PointMoment):
+                critical_points.add(load.location)
+                if load.location > 0.001:
+                    critical_points.add(load.location - 0.001)
 
         sorted_points = sorted(list(critical_points))
         m_points = [self.get_bending_moment(x) for x in sorted_points]

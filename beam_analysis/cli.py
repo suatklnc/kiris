@@ -4,7 +4,7 @@ import numpy as np
 from rich.console import Console
 from rich.table import Table
 from beam_analysis.beam import Beam
-from beam_analysis.loads import PointLoad, UDL
+from beam_analysis.loads import PointLoad, UDL, PointMoment
 from beam_analysis.plotter import ASCIIPlotter
 
 app = typer.Typer(
@@ -29,6 +29,11 @@ def display_input_summary(beam, loads):
             )
         elif isinstance(load, UDL):
             table.add_row(f"Yük {i+1} (UDL)", f"Miktar: {load.magnitude} kN/m")
+        elif isinstance(load, PointMoment):
+            table.add_row(
+                f"Yük {i+1} (Moment)",
+                f"Miktar: {load.moment} kNm, Konum: {load.location} m",
+            )
 
     console.print(table)
 
@@ -94,6 +99,7 @@ def get_loads(beam_length: float):
         choices = [
             ("Tekil Yük (Point Load)", "point"),
             ("Düzgün Yayılı Yük (UDL)", "udl"),
+            ("Tekil Moment (Point Moment)", "moment"),
             ("Analizi Başlat", "analyze"),
         ]
         questions = [
@@ -141,6 +147,29 @@ def get_loads(beam_length: float):
             ]
             ans_udl = inquirer.prompt(q_udl)
             loads.append(UDL(magnitude=float(ans_udl["magnitude"])))
+
+        elif answers["type"] == "moment":
+            q_moment = [
+                inquirer.Text(
+                    "moment",
+                    message="Moment miktarını girin (kNm, saat yönü için pozitif)",
+                    validate=lambda _, x: x.replace("-", "", 1)
+                    .replace(".", "", 1)
+                    .isdigit(),
+                ),
+                inquirer.Text(
+                    "location",
+                    message=f"Momentin konumunu girin (0 - {beam_length} m arası)",
+                    validate=lambda _, x: 0 <= float(x) <= beam_length,
+                ),
+            ]
+            ans_moment = inquirer.prompt(q_moment)
+            loads.append(
+                PointMoment(
+                    moment=float(ans_moment["moment"]),
+                    location=float(ans_moment["location"]),
+                )
+            )
 
         console.print(f"[green]Yük eklendi. Toplam yük sayısı: {len(loads)}[/green]")
 

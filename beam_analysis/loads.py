@@ -43,3 +43,24 @@ class UDL(Load):
 
     def __str__(self):
         return f"UDL(magnitude={self.magnitude} kN/m)"
+
+
+@dataclass
+class PointMoment(Load):
+    """
+    A concentrated moment applied at a specific location on the beam.
+
+    Attributes:
+        moment (float): The magnitude of the moment in kNm. Positive is clockwise.
+        location (float): The location of the moment in meters from the left support.
+    """
+
+    moment: float
+    location: float
+
+    def __post_init__(self):
+        if self.location < 0:
+            raise ValueError("Location cannot be negative.")
+
+    def __str__(self):
+        return f"PointMoment(moment={self.moment} kNm, location={self.location} m)"

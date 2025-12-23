@@ -1,5 +1,5 @@
 import pytest
-from beam_analysis.loads import PointLoad, UDL
+from beam_analysis.loads import PointLoad, UDL, PointMoment
 
 
 def test_point_load_initialization():
@@ -26,3 +26,14 @@ def test_udl_representation():
 def test_point_load_representation():
     load = PointLoad(force=10.0, location=2.5)
     assert str(load) == "PointLoad(force=10.0 kN, location=2.5 m)"
+
+
+def test_point_moment_initialization():
+    load = PointMoment(moment=10.0, location=5.0)
+    assert load.moment == 10.0
+    assert load.location == 5.0
+
+
+def test_point_moment_representation():
+    load = PointMoment(moment=10.0, location=5.0)
+    assert str(load) == "PointMoment(moment=10.0 kNm, location=5.0 m)"

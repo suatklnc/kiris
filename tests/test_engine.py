@@ -146,3 +146,33 @@ def test_get_max_values_udl():
     # Max M is 62.5kNm at x=5
     assert max_m_val == pytest.approx(62.5)
     assert max_m_x == pytest.approx(5.0)
+
+
+def test_calculate_reactions_point_moment():
+    from beam_analysis.loads import PointMoment
+
+    beam = Beam(length=10.0, supports=(0.0, 10.0))
+    engine = AnalysisEngine(beam=beam)
+    # 10 kNm clockwise at 5m
+    engine.add_load(PointMoment(moment=10.0, location=5.0))
+    reactions = engine.calculate_reactions()
+    # R1 = -1, R2 = 1
+    assert reactions[0.0] == pytest.approx(-1.0)
+    assert reactions[10.0] == pytest.approx(1.0)
+
+
+def test_get_bending_moment_point_moment():
+    from beam_analysis.loads import PointMoment
+
+    beam = Beam(length=10.0, supports=(0.0, 10.0))
+    engine = AnalysisEngine(beam=beam)
+    engine.add_load(PointMoment(moment=10.0, location=5.0))
+
+    # x=2.5: M = -1 * 2.5 = -2.5
+    assert engine.get_bending_moment(2.5) == pytest.approx(-2.5)
+
+    # x=5.0: M = -5 + 10 = 5.0 (Upper jump)
+    assert engine.get_bending_moment(5.0) == pytest.approx(5.0)
+
+    # x=7.5: M = -7.5 + 10 = 2.5
+    assert engine.get_bending_moment(7.5) == pytest.approx(2.5)
